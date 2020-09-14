@@ -9,6 +9,15 @@
 
 import os, hashlib
 from PyQt5 import QtCore, QtGui, QtWidgets
+from fbs_runtime.application_context.PyQt5 import ApplicationContext, cached_property
+
+
+class AppContext(ApplicationContext):
+    @cached_property
+    def switch_icon(self):
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(self.get_resource('icons/swap_horiz-24px.svg')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        return icon
 
 
 class Ui_MainWindow(object):
@@ -18,6 +27,7 @@ class Ui_MainWindow(object):
         self.hash_type_all = ["MD5", "SHA1", "SHA256", "SHA512"]
         self.current_hash_type_index = 0
         QtWidgets.QApplication.clipboard().dataChanged.connect(self.on_clipboard_change)
+        self.ctx = AppContext()
 
     def get_hash_type(self):
         return self.hash_type_all[self.current_hash_type_index]
@@ -151,9 +161,7 @@ class Ui_MainWindow(object):
                                             "    background-color: rgb(237, 237, 237);\n"
                                             "}")
         self.next_hash_button.setText("")
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("swap_horiz-24px.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.next_hash_button.setIcon(icon)
+        self.next_hash_button.setIcon(self.ctx.switch_icon)
         self.next_hash_button.setObjectName("next_hash_button")
         self.next_hash_button.clicked.connect(self.on_push_next_hash_button)
         self.current_hash_label = QtWidgets.QLabel(self.frame)
@@ -227,9 +235,10 @@ class Ui_MainWindow(object):
 if __name__ == "__main__":
     import sys
 
-    app = QtWidgets.QApplication(sys.argv)
+    app_context = AppContext()
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
-    sys.exit(app.exec_())
+    exit_code = app_context.app.exec_()
+    sys.exit(exit_code)
