@@ -43,8 +43,8 @@ class Ui_MainWindow(object):
 
     def get_file_checksum(self, fp, hash_func):
         with open(fp, mode='rb') as f:
-            for chunk in iter(f.read(1024)):
-                hash_func.update(bytes(chunk))
+            for chunk in iter(lambda: f.read(1024), b''):
+                hash_func.update(chunk)
             checksum = hash_func.hexdigest()
         return checksum
 
@@ -175,7 +175,7 @@ class Ui_MainWindow(object):
         self.next_hash_label.setAlignment(QtCore.Qt.AlignCenter)
         self.next_hash_label.setObjectName("next_hash_label")
         self.compare_result_label = QtWidgets.QLabel(self.frame)
-        self.compare_result_label.setGeometry(QtCore.QRect(10, 20, 231, 71))
+        self.compare_result_label.setGeometry(QtCore.QRect(10, 20, 250, 71))
         font = QtGui.QFont()
         font.setPointSize(12)
         font.setBold(True)
