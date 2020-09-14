@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>703</width>
+    <height>478</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QFrame" name="frame">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>721</width>
+      <height>491</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(242, 250, 252)</string>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <widget class="QLabel" name="file_extension_label">
+     <property name="geometry">
+      <rect>
+       <x>305</x>
+       <y>10</y>
+       <width>100</width>
+       <height>100</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File extension&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(236, 193, 18);
+color: rgb(255, 255, 255);
+border-radius: 50%;
+font-size: 20pt;</string>
+     </property>
+     <property name="text">
+      <string>iso</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="filename_label">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>120</y>
+       <width>711</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Filename&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(42, 129, 165);</string>
+     </property>
+     <property name="text">
+      <string>windows-10</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="import_button">
+     <property name="geometry">
+      <rect>
+       <x>310</x>
+       <y>350</y>
+       <width>101</width>
+       <height>36</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select your file to get hash value&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+	background-color: rgb(42, 129, 165);
+	border: 1px soli	d;
+	color: white;
+}
+QPushButton:hover {
+	background-color: rgb(36, 114, 144)
+}</string>
+     </property>
+     <property name="text">
+      <string>Import</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="hash_result">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>250</y>
+       <width>681</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-size: 13pt;
+color: rgb(42, 129, 165);</string>
+     </property>
+     <property name="text">
+      <string>e43b3e2da3be90029bc45f9c7ad061e7</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="next_hash_button">
+     <property name="geometry">
+      <rect>
+       <x>330</x>
+       <y>190</y>
+       <width>51</width>
+       <height>36</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Swicth between hash type [MD5, SHA1, SHA256 etc ...]&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">
+
+QPushButton {
+	background-color: rgb(255, 255, 255);
+	border: 0 solid;
+}
+
+QPushButton:hover {
+	background-color: rgb(237, 237, 237);
+}</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>../Downloads/swap_horiz-24px.svg</normaloff>../Downloads/swap_horiz-24px.svg</iconset>
+     </property>
+    </widget>
+    <widget class="QLabel" name="current_hash_label">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>190</y>
+       <width>81</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Current hash type&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(42, 129, 165);</string>
+     </property>
+     <property name="text">
+      <string>MD5</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="next_hash_label">
+     <property name="geometry">
+      <rect>
+       <x>620</x>
+       <y>190</y>
+       <width>81</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next hash type&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(42, 129, 165);</string>
+     </property>
+     <property name="text">
+      <string>SHA1</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="compare_result_label">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>231</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Current hash match with the value from the clipboard&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-size: 12pt;
+color: rgb(212, 170, 0)</string>
+     </property>
+     <property name="text">
+      <string>Perfect match with clipboard !</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="reset_button">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>420</y>
+       <width>101</width>
+       <height>36</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reset&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">
+QPushButton {
+	background-color: rgb(236, 193, 18);
+	border: 1px soli	d;
+	color: white;
+
+}
+
+QPushButton:hover {
+	background-color: rgb(212, 170, 0);
+}</string>
+     </property>
+     <property name="text">
+      <string>Reset</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="compare_tips_label">
+     <property name="geometry">
+      <rect>
+       <x>420</x>
+       <y>410</y>
+       <width>271</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Copy original hash to clipboard to compare</string>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
