@@ -127,10 +127,9 @@ class Ui_MainWindow(object):
             home_directory_path = QtCore.QDir.homePath()
             fp = QtWidgets.QFileDialog(directory=home_directory_path).getOpenFileName()[0]
 
-        if QtCore.QDir().rootPath() == os.sep.join(fp.split(os.sep)[:-1]) + os.sep:
-            last_open_directory = user_download_path
-        else:
-            last_open_directory = os.sep.join(fp.split(os.sep)[:-1]) + os.sep
+        last_open_directory = os.sep.join(fp.split(os.sep)[:-1]) + os.sep
+        if last_open_directory == QtCore.QDir().rootPath():
+            last_open_directory = None
 
         if fp:
             self.on_push_reset_button()
@@ -367,7 +366,8 @@ class Ui_MainWindow(object):
         self.label.setText(_translate("MainWindow", "© 2020 Copyright | Abdoulaye Koumare"))
         self.current_hash_label.setText(_translate("MainWindow", "MD5"))
         self.next_hash_label.setText(_translate("MainWindow", "SHA1"))
-        self.filename_label.setText(_translate("MainWindow", "The most minimalist and smartest checksum verifier ever !"))
+        self.filename_label.setText(
+            _translate("MainWindow", "The most minimalist and smartest checksum verifier ever !"))
         self.hash_copy_info.setText(_translate("MainWindow", ""))
         self.compare_result_icon.setVisible(False)
         self.compare_tip_icon_label.setVisible(False)
