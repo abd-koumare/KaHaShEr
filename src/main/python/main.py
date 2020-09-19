@@ -113,7 +113,7 @@ class Ui_MainWindow(object):
             self.filename_label.setText(f_name)
             self.file_extension_label.setText(f_name.split('.')[-1])
             self.hash_result_label.setText(self.format_hash_result_label(self.calculate_file_checksum(fp)))
-            self.compare_tips_label.setText("Copy the hash value in the clipboard to make comparison")
+            self.compare_tips_label.setText("Copy the hash value in the clipboard to compare")
             self.compare_tip_icon_label.setVisible(True)
 
     def on_push_next_hash_button(self):
@@ -185,7 +185,7 @@ class Ui_MainWindow(object):
         self.illustration_img_label.setPixmap(self.app_context.people_icon)
         self.illustration_img_label.setObjectName("illustration_img_label")
         self.hash_result_label = QtWidgets.QLabel(self.frame)
-        self.hash_result_label.setGeometry(QtCore.QRect(100, 340, 621, 61))
+        self.hash_result_label.setGeometry(QtCore.QRect(90, 340, 641, 61))
         self.hash_result_label.setStyleSheet("border-radius: 6px;\n"
                                              "border: 2px solid rgb(0, 0, 0);\n"
                                              "padding-left: 6px;\n"
@@ -222,12 +222,12 @@ class Ui_MainWindow(object):
         self.reset_button.setIcon(icon)
         self.reset_button.setObjectName("reset_button")
         self.compare_tips_label = QtWidgets.QLabel(self.frame)
-        self.compare_tips_label.setGeometry(QtCore.QRect(310, 510, 381, 31))
+        self.compare_tips_label.setGeometry(QtCore.QRect(410, 510, 400, 31))
         self.compare_tips_label.setStyleSheet("font-size: 11pt;\n"
                                               "color: rgb(0, 0, 0);")
         self.compare_tips_label.setObjectName("compare_tips_label")
         self.compare_tip_icon_label = QtWidgets.QLabel(self.frame)
-        self.compare_tip_icon_label.setGeometry(QtCore.QRect(280, 500, 31, 51))
+        self.compare_tip_icon_label.setGeometry(QtCore.QRect(380, 500, 31, 51))
         self.compare_tip_icon_label.setText("")
         self.compare_tip_icon_label.setPixmap(self.app_context.bulb_icon)
         self.compare_tip_icon_label.setObjectName("compare_tip_icon_label")
