@@ -270,7 +270,7 @@ class Ui_MainWindow(object):
                                               "font-weight: bold;")
         self.current_hash_label.setObjectName("current_hash_label")
         self.next_hash_label = QtWidgets.QLabel(self.frame)
-        self.next_hash_label.setGeometry(QtCore.QRect(650, 290, 71, 41))
+        self.next_hash_label.setGeometry(QtCore.QRect(640, 290, 71, 41))
         self.next_hash_label.setStyleSheet("font-size: 13pt;\n"
                                            "color: rgb(0, 0, 0);\n"
                                            "font-weight: bold;")
@@ -294,7 +294,7 @@ class Ui_MainWindow(object):
         self.next_hash_button.setIcon(icon2)
         self.next_hash_button.setObjectName("next_hash_button")
         self.filename_label = QtWidgets.QLabel(self.frame)
-        self.filename_label.setGeometry(QtCore.QRect(65, 130, 681, 20))
+        self.filename_label.setGeometry(QtCore.QRect(64, 130, 681, 20))
         self.filename_label.setStyleSheet("font-weight: bold;\n"
                                           "color: rgb(138, 146, 167);")
         self.filename_label.setAlignment(QtCore.Qt.AlignCenter)
