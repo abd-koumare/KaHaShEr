@@ -43,68 +43,77 @@ class AppContext(ApplicationContext):
 
 
 last_open_directory = None
+selected_file_path = None
+current_clipboard_txt_val = None
+hash_type_all = ["MD5", "SHA1", "SHA256", "SHA512"]
+current_hash_type_index = 0
+
+
+def get_hash_type():
+    global hash_type_all, current_hash_type_index
+    return hash_type_all[current_hash_type_index]
+
+
+def is_hex(s):
+    return all(char in string.hexdigits for char in s)
+
+
+def get_file_checksum(fp, hash_func):
+    with open(fp, mode='rb') as f:
+        for chunk in iter(lambda: f.read(1024), b''):
+            hash_func.update(bytes(chunk))
+        checksum = hash_func.hexdigest()
+    return checksum
+
+
+def calculate_file_checksum(fp):
+    if get_hash_type().lower() == "md5":
+        md5 = hashlib.md5()
+        return get_file_checksum(fp, hash_func=md5)
+    if get_hash_type().lower() == "sha1":
+        sha1 = hashlib.sha1()
+        return get_file_checksum(fp, hash_func=sha1)
+    elif get_hash_type().lower() == "sha256":
+        sha256 = hashlib.sha256()
+        return get_file_checksum(fp, hash_func=sha256)
+    elif get_hash_type().lower() == "sha512":
+        sha512 = hashlib.sha512()
+        return get_file_checksum(fp, hash_func=sha512)
+    else:
+        raise ValueError('Choose a valid hash type [md5, sha1, sha256, sha512 ]')
+
+
+def get_file_name(fp):
+    return fp.split(os.sep)[-1]
+
+
+def format_hash_result(txt, block_n=64):
+    if block_n >= len(txt):
+        return txt
+    s, e, fmt_txt = 0, block_n, ''
+    for x in range(len(txt) // block_n):
+        fmt_txt += txt[s:e] + ' '
+        s = e + 1
+        e = s + block_n
+    return fmt_txt
+
+
+def undo_format_hash_result(txt):
+    return ''.join(txt.split())
 
 
 class Ui_MainWindow(object):
 
     def __init__(self):
-        self.selected_file_path = None
-        self.clipboard_txt = None
-        self.hash_type_all = ["MD5", "SHA1", "SHA256", "SHA512"]
-        self.current_hash_type_index = 0
-        QtWidgets.QApplication.clipboard().dataChanged.connect(self.on_clipboard_change)
         self.app_context = AppContext()
 
-    def get_hash_type(self):
-        return self.hash_type_all[self.current_hash_type_index]
-
     def next_hash_type(self):
-        self.current_hash_type_index = (self.current_hash_type_index + 1) % len(self.hash_type_all)
-        if self.selected_file_path:
-            self.hash_result_label.setText(self.calculate_file_checksum(self.selected_file_path))
-        self.next_hash_button.setText(self.hash_type_all[self.current_hash_type_index])
-
-    def format_hash_result_label(self, txt, block_n=64):
-        if block_n >= len(txt):
-            return txt
-        s, e, fmt_txt = 0, block_n, ''
-        for x in range(len(txt) // block_n):
-            fmt_txt += txt[s:e] + ' '
-            s = e + 1
-            e = s + block_n
-        return fmt_txt
-
-    def unformat_hash_result_label(self, txt):
-        return ''.join(txt.split())
-
-    def is_hex(self, s):
-        return all(char in string.hexdigits for char in s)
-
-    def get_file_name(self, fp):
-        return fp.split(os.sep)[-1]
-
-    def get_file_checksum(self, fp, hash_func):
-        with open(fp, mode='rb') as f:
-            for chunk in iter(lambda: f.read(1024), b''):
-                hash_func.update(bytes(chunk))
-            checksum = hash_func.hexdigest()
-        return checksum
-
-    def calculate_file_checksum(self, fp):
-        if self.get_hash_type().lower() == "md5":
-            md5 = hashlib.md5()
-            return self.get_file_checksum(fp, hash_func=md5)
-        if self.get_hash_type().lower() == "sha1":
-            sha1 = hashlib.sha1()
-            return self.get_file_checksum(fp, hash_func=sha1)
-        elif self.get_hash_type().lower() == "sha256":
-            sha256 = hashlib.sha256()
-            return self.get_file_checksum(fp, hash_func=sha256)
-        elif self.get_hash_type().lower() == "sha512":
-            sha512 = hashlib.sha512()
-            return self.get_file_checksum(fp, hash_func=sha512)
-        else:
-            raise ValueError('Choose a valid hash type [md5, sha1, sha256, sha512 ]')
+        global hash_type_all, current_hash_type_index
+        current_hash_type_index = (current_hash_type_index + 1) % len(hash_type_all)
+        global selected_file_path
+        if selected_file_path:
+            self.hash_result_label.setText(calculate_file_checksum(selected_file_path))
+        self.next_hash_button.setText(hash_type_all[current_hash_type_index])
 
     def on_push_import_button(self):
         user_download_path = QtCore.QStandardPaths.standardLocations(QtCore.QStandardPaths.DownloadLocation)[0]
@@ -117,33 +126,42 @@ class Ui_MainWindow(object):
         else:
             home_directory_path = QtCore.QDir.homePath()
             fp = QtWidgets.QFileDialog(directory=home_directory_path).getOpenFileName()[0]
-        last_open_directory = os.sep.join(fp.split(os.sep)[:-1]) + os.sep  # keep track of last open directory
+
+        if QtCore.QDir().rootPath() == os.sep.join(fp.split(os.sep)[:-1]) + os.sep:
+            last_open_directory = user_download_path
+        else:
+            last_open_directory = os.sep.join(fp.split(os.sep)[:-1]) + os.sep
 
         if fp:
             self.on_push_reset_button()
-            self.selected_file_path = fp
-            f_name = self.get_file_name(fp)
+            global selected_file_path
+            selected_file_path = fp
+
+            f_name = get_file_name(fp)
             self.filename_label.setText(f_name)
             self.file_extension_label.setText(f_name.split('.')[-1])
-            self.hash_result_label.setText(self.format_hash_result_label(self.calculate_file_checksum(fp)))
+            self.hash_result_label.setText(format_hash_result(calculate_file_checksum(fp)))
             self.compare_tips_label.setText("Copy the hash value in the clipboard to compare")
             self.compare_tip_icon_label.setVisible(True)
 
     def on_push_next_hash_button(self):
-        self.current_hash_type_index = (self.current_hash_type_index + 1) % len(self.hash_type_all)
-        next_hash_type_index = (self.current_hash_type_index + 1) % len(self.hash_type_all)
+        global hash_type_all, current_hash_type_index
+        current_hash_type_index = (current_hash_type_index + 1) % len(hash_type_all)
+        next_hash_type_index = (current_hash_type_index + 1) % len(hash_type_all)
 
-        if self.selected_file_path:
+        global selected_file_path
+        if selected_file_path:
             self.hash_result_label.setText(
-                self.format_hash_result_label(self.calculate_file_checksum(self.selected_file_path)))
-        self.current_hash_label.setText(self.hash_type_all[self.current_hash_type_index])
-        self.next_hash_label.setText(self.hash_type_all[next_hash_type_index])
+                format_hash_result(calculate_file_checksum(selected_file_path)))
+        self.current_hash_label.setText(hash_type_all[current_hash_type_index])
+        self.next_hash_label.setText(hash_type_all[next_hash_type_index])
 
     def on_clipboard_change(self):
-        self.clipboard_txt = QtWidgets.QApplication.clipboard().text()
+        global current_clipboard_txt_val
+        current_clipboard_txt_val = QtWidgets.QApplication.clipboard().text()
 
-        if self.is_hex(self.clipboard_txt) and self.hash_result_label.text():
-            if self.clipboard_txt == self.hash_result_label.text():
+        if is_hex(current_clipboard_txt_val) and self.hash_result_label.text():
+            if current_clipboard_txt_val == self.hash_result_label.text():
                 self.compare_result_label.setText("Perfect match")
                 self.compare_result_label.setStyleSheet("font-weight: bold; font-size: 12pt; color: rgb(95, 211, 141)")
                 self.compare_result_icon.setPixmap(self.app_context.checked_icon)
@@ -157,9 +175,10 @@ class Ui_MainWindow(object):
             self.compare_tip_icon_label.setVisible(False)
 
     def on_push_reset_button(self):
-        self.selected_file_path = None
+        global selected_file_path
+        selected_file_path = None
         self.file_extension_label.setText(":)")
-        self.filename_label.setText("Hashinator ! The most minimalist checksum verifier")
+        self.filename_label.setText("The most minimalist and smart checksum verifier ever !")
         self.hash_result_label.setText("")
         self.compare_result_label.setText("")
         self.compare_tips_label.setText("")
@@ -168,7 +187,7 @@ class Ui_MainWindow(object):
         self.compare_tip_icon_label.setVisible(False)
 
     def on_push_result_label(self, ev):
-        QtWidgets.QApplication.clipboard().setText(self.unformat_hash_result_label(self.hash_result_label.text()))
+        QtWidgets.QApplication.clipboard().setText(undo_format_hash_result(self.hash_result_label.text()))
         self.compare_result_label.setStyleSheet("font-weight: bold; font-size: 12pt; color: rgb(95, 211, 141)")
         self.compare_result_label.setText("Great, copied !")
         self.compare_result_icon.setVisible(False)
@@ -324,6 +343,8 @@ class Ui_MainWindow(object):
         self.import_button.clicked.connect(self.on_push_import_button)
         self.next_hash_button.clicked.connect(self.on_push_next_hash_button)
         self.hash_result_label.mouseDoubleClickEvent = self.on_push_result_label
+        QtWidgets.QApplication.clipboard().dataChanged.connect(self.on_clipboard_change)
+
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -343,7 +364,7 @@ class Ui_MainWindow(object):
         self.label.setText(_translate("MainWindow", "© 2020 Copyright | Abdoulaye Koumare"))
         self.current_hash_label.setText(_translate("MainWindow", "MD5"))
         self.next_hash_label.setText(_translate("MainWindow", "SHA1"))
-        self.filename_label.setText(_translate("MainWindow", "Hashinator ! The most minimalist checksum verifier"))
+        self.filename_label.setText(_translate("MainWindow", "The most minimalist and smart checksum verifier ever !"))
         self.hash_copy_info.setText(_translate("MainWindow", ""))
         self.compare_result_icon.setVisible(False)
         self.compare_tip_icon_label.setVisible(False)
