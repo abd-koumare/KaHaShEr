@@ -52,9 +52,9 @@ background-color: rgb(255, 255, 255);</string>
     <widget class="QLabel" name="hash_result_label">
      <property name="geometry">
       <rect>
-       <x>100</x>
+       <x>90</x>
        <y>340</y>
-       <width>621</width>
+       <width>641</width>
        <height>61</height>
       </rect>
      </property>
@@ -130,9 +130,9 @@ QPushButton:hover {
     <widget class="QLabel" name="compare_tips_label">
      <property name="geometry">
       <rect>
-       <x>310</x>
+       <x>350</x>
        <y>510</y>
-       <width>381</width>
+       <width>401</width>
        <height>31</height>
       </rect>
      </property>
@@ -147,7 +147,7 @@ color: rgb(0, 0, 0);</string>
     <widget class="QLabel" name="compare_tip_icon_label">
      <property name="geometry">
       <rect>
-       <x>280</x>
+       <x>310</x>
        <y>500</y>
        <width>31</width>
        <height>51</height>

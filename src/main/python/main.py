@@ -161,6 +161,7 @@ class Ui_MainWindow(object):
         current_clipboard_txt_val = QtWidgets.QApplication.clipboard().text()
 
         if is_hex(current_clipboard_txt_val) and self.hash_result_label.text():
+
             if current_clipboard_txt_val == self.hash_result_label.text():
                 self.compare_result_label.setText("Perfect match")
                 self.compare_result_label.setStyleSheet("font-weight: bold; font-size: 12pt; color: rgb(95, 211, 141)")
@@ -172,6 +173,7 @@ class Ui_MainWindow(object):
                 self.compare_result_icon.setPixmap(self.app_context.x_mark_icon)
                 self.compare_result_icon.setVisible(True)
             self.compare_tips_label.setText("")
+            self.hash_copy_info.setText("")
             self.compare_tip_icon_label.setVisible(False)
 
     def on_push_reset_button(self):
@@ -188,9 +190,10 @@ class Ui_MainWindow(object):
 
     def on_push_result_label(self, ev):
         QtWidgets.QApplication.clipboard().setText(undo_format_hash_result(self.hash_result_label.text()))
-        self.compare_result_label.setStyleSheet("font-weight: bold; font-size: 12pt; color: rgb(95, 211, 141)")
-        self.compare_result_label.setText("Great, copied !")
+        self.compare_result_label.setText("")
         self.compare_result_icon.setVisible(False)
+        self.hash_copy_info.setStyleSheet("font-weight: bold; font-size: 12pt; color: rgb(95, 211, 141)")
+        self.hash_copy_info.setText("Successfully copied!")
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -332,7 +335,7 @@ class Ui_MainWindow(object):
         self.filename_label.setAlignment(QtCore.Qt.AlignCenter)
         self.filename_label.setObjectName("filename_label")
         self.hash_copy_info = QtWidgets.QLabel(self.frame)
-        self.hash_copy_info.setGeometry(QtCore.QRect(610, 40, 81, 31))
+        self.hash_copy_info.setGeometry(QtCore.QRect(540, 40, 201, 31))
         self.hash_copy_info.setStyleSheet("font-weight: bold;\n"
                                           "color: rgb(138, 146, 167);")
         self.hash_copy_info.setAlignment(QtCore.Qt.AlignCenter)
