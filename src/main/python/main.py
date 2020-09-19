@@ -195,7 +195,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
 
-        ''' Center app on screen fuck the traditional techniques '''
+        ''' Center app on screen fuck the traditional technics '''
         app_width, app_height = 801, 600
         qr = QtWidgets.QDesktopWidget().screenGeometry()
         left = (qr.width() // 2) - (app_width // 2)
@@ -364,7 +364,7 @@ class Ui_MainWindow(object):
         self.label.setText(_translate("MainWindow", "© 2020 Copyright | Abdoulaye Koumare"))
         self.current_hash_label.setText(_translate("MainWindow", "MD5"))
         self.next_hash_label.setText(_translate("MainWindow", "SHA1"))
-        self.filename_label.setText(_translate("MainWindow", "The most minimalist and smart checksum verifier ever !"))
+        self.filename_label.setText(_translate("MainWindow", "The most minimalist and smartest checksum verifier ever !"))
         self.hash_copy_info.setText(_translate("MainWindow", ""))
         self.compare_result_icon.setVisible(False)
         self.compare_tip_icon_label.setVisible(False)
