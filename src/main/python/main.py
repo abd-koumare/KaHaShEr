@@ -306,7 +306,7 @@ class Ui_MainWindow(object):
         self.hash_copy_info.setAlignment(QtCore.Qt.AlignCenter)
         self.hash_copy_info.setObjectName("hash_copy_info")
 
-        ''' connection  '''
+        ''' Connected slots to buttons  '''
         self.reset_button.clicked.connect(self.on_push_reset_button)
         self.import_button.clicked.connect(self.on_push_import_button)
         self.next_hash_button.clicked.connect(self.on_push_next_hash_button)
