@@ -42,6 +42,9 @@ class AppContext(ApplicationContext):
         return QtGui.QPixmap(self.get_resource('icons/reset.svg'))
 
 
+last_open_directory = None
+
+
 class Ui_MainWindow(object):
 
     def __init__(self):
@@ -104,7 +107,17 @@ class Ui_MainWindow(object):
             raise ValueError('Choose a valid hash type [md5, sha1, sha256, sha512 ]')
 
     def on_push_import_button(self):
-        fp = QtWidgets.QFileDialog.getOpenFileName()[0]
+        user_download_path = QtCore.QStandardPaths.standardLocations(QtCore.QStandardPaths.DownloadLocation)[0]
+
+        global last_open_directory
+        if last_open_directory:
+            fp = QtWidgets.QFileDialog(directory=last_open_directory).getOpenFileName()[0]
+        elif user_download_path:
+            fp = QtWidgets.QFileDialog(directory=user_download_path).getOpenFileName()[0]
+        else:
+            home_directory_path = QtCore.QDir.homePath()
+            fp = QtWidgets.QFileDialog(directory=home_directory_path).getOpenFileName()[0]
+        last_open_directory = os.sep.join(fp.split(os.sep)[:-1]) + os.sep  # keep track of last open directory
 
         if fp:
             self.on_push_reset_button()
