@@ -90,16 +90,17 @@ def get_file_name(fp):
 def format_hash_result(txt, block_n=64):
     if block_n >= len(txt):
         return txt
-    s, e, fmt_txt = 0, block_n, ''
-    for x in range(len(txt) // block_n):
-        fmt_txt += txt[s:e] + ' '
-        s = e + 1
-        e = s + block_n
+    fmt_txt, txt_length = '', len(txt)
+    for x in range(txt_length // block_n):
+        fmt_txt += txt[:block_n] + ' '
+        txt = txt[block_n:txt_length]
+    print(fmt_txt)
+    print(undo_format_hash_result(fmt_txt))
     return fmt_txt
 
 
 def undo_format_hash_result(txt):
-    return ''.join(txt.split())
+    return ''.join([char for char in txt if char != ' '])
 
 
 class Ui_MainWindow(object):
@@ -161,7 +162,7 @@ class Ui_MainWindow(object):
 
         if is_hex(current_clipboard_txt_val) and self.hash_result_label.text():
 
-            if current_clipboard_txt_val == self.hash_result_label.text():
+            if current_clipboard_txt_val == undo_format_hash_result(self.hash_result_label.text()):
                 self.compare_result_label.setText("Perfect match")
                 self.compare_result_label.setStyleSheet("font-weight: bold; font-size: 12pt; color: rgb(95, 211, 141)")
                 self.compare_result_icon.setPixmap(self.app_context.checked_icon)
