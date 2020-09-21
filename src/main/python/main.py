@@ -48,7 +48,7 @@ selected_file_path = None
 current_clipboard_txt_val = None
 hash_type_all = ["MD5", "SHA1", "SHA256", "SHA512"]
 current_hash_type_index = 0
-
+clipboard_changed_from_app = False
 
 ''' Util functions '''
 
@@ -98,8 +98,6 @@ def format_hash_result(txt, block_n=64):
     for x in range(txt_length // block_n):
         fmt_txt += txt[:block_n] + ' '
         txt = txt[block_n:txt_length]
-    print(fmt_txt)
-    print(undo_format_hash_result(fmt_txt))
     return fmt_txt
 
 
@@ -153,24 +151,13 @@ class Ui_MainWindow(object):
         self.next_hash_button.setText(hash_type_all[current_hash_type_index])
 
     def on_push_import_button(self):
-        global last_open_directory, current_clipboard_txt_val
+        global selected_file_path, last_open_directory, current_clipboard_txt_val
         user_download_path = QtCore.QStandardPaths.standardLocations(QtCore.QStandardPaths.DownloadLocation)[0]
 
-        if last_open_directory:
-            fp = QtWidgets.QFileDialog(directory=last_open_directory).getOpenFileName()[0]
-        elif user_download_path:
-            fp = QtWidgets.QFileDialog(directory=user_download_path).getOpenFileName()[0]
-        else:
-            home_directory_path = QtCore.QDir.homePath()
-            fp = QtWidgets.QFileDialog(directory=home_directory_path).getOpenFileName()[0]
-
-        last_open_directory = os.sep.join(fp.split(os.sep)[:-1]) + os.sep
-        if last_open_directory == QtCore.QDir().rootPath():
-            last_open_directory = None
+        fp = QtWidgets.QFileDialog(directory=user_download_path).getOpenFileName()[0]
 
         if fp:
             self.on_push_reset_button()
-            global selected_file_path
             selected_file_path = fp
 
             f_name = get_file_name(fp)
@@ -194,16 +181,21 @@ class Ui_MainWindow(object):
         self.ui_hide_compare_result()
 
     def on_clipboard_change(self):
-        global current_clipboard_txt_val
+        global current_clipboard_txt_val, clipboard_changed_from_app
         current_clipboard_txt_val = QtWidgets.QApplication.clipboard().text()
 
-        if is_hex(current_clipboard_txt_val) and self.hash_result_label.text():
-            if current_clipboard_txt_val == undo_format_hash_result(self.hash_result_label.text()):
-                self.ui_set_success_compare()
-            else:
-                self.ui_set_error_compare()
-            self.ui_set_compare_tip_visibility(False)
-            self.ui_set_hash_copy_info_visibility(False)
+        if clipboard_changed_from_app:
+            self.ui_hide_compare_result()
+            self.ui_set_hash_copy_info_visibility(True)
+            clipboard_changed_from_app = False
+        else:
+            if is_hex(current_clipboard_txt_val) and self.hash_result_label.text():
+                if current_clipboard_txt_val == undo_format_hash_result(self.hash_result_label.text()):
+                    self.ui_set_success_compare()
+                else:
+                    self.ui_set_error_compare()
+                self.ui_set_compare_tip_visibility(False)
+                self.ui_set_hash_copy_info_visibility(False)
 
     def on_push_reset_button(self):
         global selected_file_path
@@ -219,13 +211,12 @@ class Ui_MainWindow(object):
         self.ui_set_compare_tip_visibility(False)
 
     def on_push_result_label(self, ev):
+        global clipboard_changed_from_app
 
         hash_result_val = undo_format_hash_result(self.hash_result_label.text())
         if hash_result_val:
             QtWidgets.QApplication.clipboard().setText(hash_result_val)
-            self.ui_hide_compare_result()
-            self.ui_set_hash_copy_info_visibility(True)
-
+            clipboard_changed_from_app = True
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
