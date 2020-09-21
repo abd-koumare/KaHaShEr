@@ -179,9 +179,6 @@ class Ui_MainWindow(object):
             self.hash_result_label.setText(format_hash_result(calculate_file_checksum(fp)))
             self.ui_set_compare_tip_visibility(True)
 
-            '''Check if doesn't match with current clipboard value'''
-            self.on_clipboard_change()
-
     def on_push_next_hash_button(self):
         global selected_file_path, hash_type_all, current_hash_type_index
         current_hash_type_index = (current_hash_type_index + 1) % len(hash_type_all)
