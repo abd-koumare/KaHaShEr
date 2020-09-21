@@ -51,6 +51,8 @@ current_hash_type_index = 0
 
 
 ''' Util functions '''
+
+
 def get_hash_type():
     global hash_type_all, current_hash_type_index
     return hash_type_all[current_hash_type_index]
