@@ -42,6 +42,7 @@ class AppContext(ApplicationContext):
         return QtGui.QPixmap(self.get_resource('icons/reset.svg'))
 
 
+''' Global variables '''
 last_open_directory = None
 selected_file_path = None
 current_clipboard_txt_val = None
@@ -49,6 +50,7 @@ hash_type_all = ["MD5", "SHA1", "SHA256", "SHA512"]
 current_hash_type_index = 0
 
 
+''' Util functions '''
 def get_hash_type():
     global hash_type_all, current_hash_type_index
     return hash_type_all[current_hash_type_index]
@@ -108,6 +110,38 @@ class Ui_MainWindow(object):
     def __init__(self):
         self.app_context = AppContext()
 
+    def ui_set_success_compare(self):
+        _translate = QtCore.QCoreApplication.translate
+        self.compare_result_label.setText(_translate("MainWindow", 'Perfect match'))
+        self.compare_result_label.setVisible(True)
+        self.compare_result_icon.setVisible(True)
+        self.compare_result_icon.setPixmap(self.app_context.checked_icon)
+        self.compare_result_label.setStyleSheet("font-weight: bold; font-size: 12pt; color: rgb(95, 211, 141)")
+
+    def ui_set_error_compare(self):
+        _translate = QtCore.QCoreApplication.translate
+        self.compare_result_label.setText(_translate("MainWindow", 'Do not match'))
+        self.compare_result_label.setVisible(True)
+        self.compare_result_icon.setVisible(True)
+        self.compare_result_icon.setPixmap(self.app_context.x_mark_icon)
+        self.compare_result_label.setStyleSheet("font-weight: bold;font-size: 12pt; color: rgb(198, 54, 54)")
+
+    def ui_hide_compare_result(self):
+        self.compare_result_label.setVisible(False)
+        self.compare_result_icon.setVisible(False)
+
+    def ui_set_compare_tip_visibility(self, show):
+        _translate = QtCore.QCoreApplication.translate
+        self.compare_tips_label.setText(_translate("MainWindow", "Copy the hash value in the clipboard to compare"))
+        self.compare_tip_icon_label.setVisible(show)
+        self.compare_tips_label.setVisible(show)
+
+    def ui_set_hash_copy_info_visibility(self, show):
+        _translate = QtCore.QCoreApplication.translate
+        self.hash_copy_info.setText(_translate("MainWindow", "Successfully copied!"))
+        self.hash_copy_info.setVisible(show)
+        self.hash_copy_info.setStyleSheet("font-weight: bold; font-size: 12pt; color: rgb(95, 211, 141)")
+
     def next_hash_type(self):
         global hash_type_all, current_hash_type_index
         current_hash_type_index = (current_hash_type_index + 1) % len(hash_type_all)
@@ -117,9 +151,9 @@ class Ui_MainWindow(object):
         self.next_hash_button.setText(hash_type_all[current_hash_type_index])
 
     def on_push_import_button(self):
+        global last_open_directory, current_clipboard_txt_val
         user_download_path = QtCore.QStandardPaths.standardLocations(QtCore.QStandardPaths.DownloadLocation)[0]
 
-        global last_open_directory
         if last_open_directory:
             fp = QtWidgets.QFileDialog(directory=last_open_directory).getOpenFileName()[0]
         elif user_download_path:
@@ -141,59 +175,58 @@ class Ui_MainWindow(object):
             self.filename_label.setText(f_name)
             self.file_extension_label.setText(f_name.split('.')[-1])
             self.hash_result_label.setText(format_hash_result(calculate_file_checksum(fp)))
-            self.compare_tips_label.setText("Copy the hash value in the clipboard to compare")
-            self.compare_tip_icon_label.setVisible(True)
+            self.ui_set_compare_tip_visibility(True)
+
+            '''Check if doesn't match with current clipboard value'''
+            self.on_clipboard_change()
 
     def on_push_next_hash_button(self):
-        global hash_type_all, current_hash_type_index
+        global selected_file_path, hash_type_all, current_hash_type_index
         current_hash_type_index = (current_hash_type_index + 1) % len(hash_type_all)
         next_hash_type_index = (current_hash_type_index + 1) % len(hash_type_all)
 
-        global selected_file_path
         if selected_file_path:
             self.hash_result_label.setText(
                 format_hash_result(calculate_file_checksum(selected_file_path)))
         self.current_hash_label.setText(hash_type_all[current_hash_type_index])
         self.next_hash_label.setText(hash_type_all[next_hash_type_index])
 
+        self.ui_set_hash_copy_info_visibility(False)
+        self.ui_hide_compare_result()
+
     def on_clipboard_change(self):
         global current_clipboard_txt_val
         current_clipboard_txt_val = QtWidgets.QApplication.clipboard().text()
 
         if is_hex(current_clipboard_txt_val) and self.hash_result_label.text():
-
             if current_clipboard_txt_val == undo_format_hash_result(self.hash_result_label.text()):
-                self.compare_result_label.setText("Perfect match")
-                self.compare_result_label.setStyleSheet("font-weight: bold; font-size: 12pt; color: rgb(95, 211, 141)")
-                self.compare_result_icon.setPixmap(self.app_context.checked_icon)
-                self.compare_result_icon.setVisible(True)
+                self.ui_set_success_compare()
             else:
-                self.compare_result_label.setText("Do not match")
-                self.compare_result_label.setStyleSheet("font-weight: bold;font-size: 12pt; color: rgb(198, 54, 54)")
-                self.compare_result_icon.setPixmap(self.app_context.x_mark_icon)
-                self.compare_result_icon.setVisible(True)
-            self.compare_tips_label.setText("")
-            self.hash_copy_info.setText("")
-            self.compare_tip_icon_label.setVisible(False)
+                self.ui_set_error_compare()
+            self.ui_set_compare_tip_visibility(False)
+            self.ui_set_hash_copy_info_visibility(False)
 
     def on_push_reset_button(self):
         global selected_file_path
         selected_file_path = None
+        _translate = QtCore.QCoreApplication.translate
+
         self.file_extension_label.setText(":)")
-        self.filename_label.setText("The most minimalist and smart checksum verifier ever !")
+        self.filename_label.setText(_translate("MainWindow", "The most minimalist and smart checksum verifier ever !"))
         self.hash_result_label.setText("")
-        self.compare_result_label.setText("")
-        self.compare_tips_label.setText("")
-        self.hash_copy_info.setText("")
-        self.compare_result_icon.setVisible(False)
-        self.compare_tip_icon_label.setVisible(False)
+
+        self.ui_hide_compare_result()
+        self.ui_set_hash_copy_info_visibility(False)
+        self.ui_set_compare_tip_visibility(False)
 
     def on_push_result_label(self, ev):
-        QtWidgets.QApplication.clipboard().setText(undo_format_hash_result(self.hash_result_label.text()))
-        self.compare_result_label.setText("")
-        self.compare_result_icon.setVisible(False)
-        self.hash_copy_info.setStyleSheet("font-weight: bold; font-size: 12pt; color: rgb(95, 211, 141)")
-        self.hash_copy_info.setText("Successfully copied!")
+
+        hash_result_val = undo_format_hash_result(self.hash_result_label.text())
+        if hash_result_val:
+            QtWidgets.QApplication.clipboard().setText(hash_result_val)
+            self.ui_hide_compare_result()
+            self.ui_set_hash_copy_info_visibility(True)
+
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -299,13 +332,13 @@ class Ui_MainWindow(object):
         self.label.setStyleSheet("font-size: 12px;")
         self.label.setObjectName("label")
         self.current_hash_label = QtWidgets.QLabel(self.frame)
-        self.current_hash_label.setGeometry(QtCore.QRect(110, 290, 71, 31))
+        self.current_hash_label.setGeometry(QtCore.QRect(90, 290, 71, 31))
         self.current_hash_label.setStyleSheet("font-size: 13pt;\n"
                                               "color: rgb(0, 0, 0);\n"
                                               "font-weight: bold;")
         self.current_hash_label.setObjectName("current_hash_label")
         self.next_hash_label = QtWidgets.QLabel(self.frame)
-        self.next_hash_label.setGeometry(QtCore.QRect(640, 290, 71, 41))
+        self.next_hash_label.setGeometry(QtCore.QRect(658, 290, 71, 41))
         self.next_hash_label.setStyleSheet("font-size: 13pt;\n"
                                            "color: rgb(0, 0, 0);\n"
                                            "font-weight: bold;")
@@ -345,7 +378,7 @@ class Ui_MainWindow(object):
         self.reset_button.clicked.connect(self.on_push_reset_button)
         self.import_button.clicked.connect(self.on_push_import_button)
         self.next_hash_button.clicked.connect(self.on_push_next_hash_button)
-        self.hash_result_label.mouseDoubleClickEvent = self.on_push_result_label
+        self.hash_result_label.mouseReleaseEvent = self.on_push_result_label
         QtWidgets.QApplication.clipboard().dataChanged.connect(self.on_clipboard_change)
 
         MainWindow.setCentralWidget(self.centralwidget)
@@ -361,7 +394,7 @@ class Ui_MainWindow(object):
         self.file_extension_label.setText(_translate("MainWindow", ":)"))
         self.reset_button.setText(_translate("MainWindow", "Reset"))
         self.compare_tips_label.setText(
-            _translate("MainWindow", ""))
+            _translate("MainWindow", "Copy the hash value in the clipboard to compare"))
         self.compare_result_label.setText(_translate("MainWindow", ""))
         self.import_button.setText(_translate("MainWindow", "Import"))
         self.label.setText(_translate("MainWindow", "© 2020 Copyright | Abdoulaye Koumare"))
@@ -369,18 +402,20 @@ class Ui_MainWindow(object):
         self.next_hash_label.setText(_translate("MainWindow", "SHA1"))
         self.filename_label.setText(
             _translate("MainWindow", "The most minimalist and smartest checksum verifier ever !"))
-        self.hash_copy_info.setText(_translate("MainWindow", ""))
+        self.hash_copy_info.setText(_translate("MainWindow", "Successfully copied!"))
+        self.hash_copy_info.setVisible(False)
         self.compare_result_icon.setVisible(False)
-        self.compare_tip_icon_label.setVisible(False)
-        self.hash_result_label.setToolTip("Double click to copy the content")
+
+        self.ui_set_compare_tip_visibility(False)
+        self.hash_result_label.setToolTip("Click to copy the content")
 
 
 if __name__ == "__main__":
     import sys
 
-    app_ctx = AppContext()
+    app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
-    sys.exit(app_ctx.app.exec_())
+    sys.exit(app.exec_())
