@@ -154,15 +154,18 @@ class Ui_MainWindow(object):
         global selected_file_path, last_open_directory, current_clipboard_txt_val
         user_download_path = QtCore.QStandardPaths.standardLocations(QtCore.QStandardPaths.DownloadLocation)[0]
 
-        fp = QtWidgets.QFileDialog(directory=user_download_path).getOpenFileName()[0]
+        if last_open_directory:
+            fp = QtWidgets.QFileDialog(directory=last_open_directory).getOpenFileName()[0]
+        else:
+            fp = QtWidgets.QFileDialog(directory=user_download_path).getOpenFileName()[0]
+        last_open_directory = fp
 
         if fp:
             self.on_push_reset_button()
             selected_file_path = fp
 
-            f_name = get_file_name(fp)
-            self.filename_label.setText(f_name)
-            self.file_extension_label.setText(f_name.split('.')[-1])
+            self.filename_label.setText(fp)
+            self.file_extension_label.setText(fp.split('.')[-1])
             self.hash_result_label.setText(format_hash_result(calculate_file_checksum(fp)))
             self.ui_set_compare_tip_visibility(True)
 
