@@ -200,9 +200,7 @@ class Ui_MainWindow(object):
         current_clipboard_txt_val = QtWidgets.QApplication.clipboard().text()
 
         if clipboard_changed_from_app:
-            self.ui_hide_compare_result()
-            self.ui_set_hash_copy_info_visibility(True)
-            clipboard_changed_from_app = False
+            clipboard_changed_from_app = not clipboard_changed_from_app
         else:
             if is_hex(current_clipboard_txt_val) and self.hash_result_label.text():
                 if current_clipboard_txt_val == undo_format_hash_result(self.hash_result_label.text()):
@@ -230,8 +228,11 @@ class Ui_MainWindow(object):
 
         hash_result_val = undo_format_hash_result(self.hash_result_label.text())
         if hash_result_val:
-            QtWidgets.QApplication.clipboard().setText(hash_result_val)
             clipboard_changed_from_app = True
+            QtWidgets.QApplication.clipboard().setText(hash_result_val)
+            self.ui_hide_compare_result()
+            self.ui_set_hash_copy_info_visibility(True)
+
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
