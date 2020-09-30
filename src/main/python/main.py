@@ -50,8 +50,10 @@ class AppContext(ApplicationContext):
         return self.get_resource('sounds/error.wav')
 
 
-''' Global variables '''
 
+
+
+''' Global variables '''
 
 last_open_directory = None
 selected_file_path = None
@@ -59,7 +61,6 @@ current_clipboard_txt_val = None
 hash_type_all = ["MD5", "SHA1", "SHA256", "SHA512"]
 current_hash_type_index = 0
 clipboard_changed_from_app = False
-
 
 ''' Util functions '''
 
@@ -71,35 +72,6 @@ def get_hash_type():
 
 def is_hex(s):
     return all(char in string.hexdigits for char in s)
-
-
-def get_file_checksum(fp, hash_func):
-    with open(fp, mode='rb') as f:
-        for chunk in iter(lambda: f.read(4096), b''):
-            hash_func.update(bytes(chunk))
-        checksum = hash_func.hexdigest()
-    return checksum
-
-
-def calculate_file_checksum(fp):
-    if get_hash_type().lower() == "md5":
-        md5 = hashlib.md5()
-        return get_file_checksum(fp, hash_func=md5)
-    if get_hash_type().lower() == "sha1":
-        sha1 = hashlib.sha1()
-        return get_file_checksum(fp, hash_func=sha1)
-    elif get_hash_type().lower() == "sha256":
-        sha256 = hashlib.sha256()
-        return get_file_checksum(fp, hash_func=sha256)
-    elif get_hash_type().lower() == "sha512":
-        sha512 = hashlib.sha512()
-        return get_file_checksum(fp, hash_func=sha512)
-    else:
-        raise ValueError('Choose a valid hash type [md5, sha1, sha256, sha512 ]')
-
-
-def get_file_name(fp):
-    return fp.split(os.sep)[-1]
 
 
 def format_hash_result(txt, block_n=64):
@@ -116,10 +88,50 @@ def undo_format_hash_result(txt):
     return ''.join([char for char in txt if char != ' '])
 
 
+'''
+    Thread
+'''
+
+
+def get_hash_func():
+    hash_dict = {
+        'md5': hashlib.md5(),
+        'sha1': hashlib.sha1(),
+        'sha256': hashlib.sha256(),
+        'sha512': hashlib.sha512(),
+    }
+
+    try:
+        hash_func = hash_dict[get_hash_type().lower()]
+    except KeyError:
+        raise ValueError('Choose a valid hash type [md5, sha1, sha256, sha512 ]')
+    return hash_func
+
+
+class GetFileHashThread(QtCore.QThread):
+    finished = QtCore.pyqtSignal(str)
+
+    def __init__(self, file_path):
+        super(GetFileHashThread, self).__init__(parent=None)
+        self.file_path, self.hash_func = file_path, get_hash_func()
+
+    def run(self):
+        with open(self.file_path, mode='rb') as file:
+            for chunk in iter(lambda: file.read(4096), b''):
+                self.hash_func.update(chunk)
+            hash_result = self.hash_func.hexdigest()
+            self.finished.emit(hash_result)
+
+
+
 class Ui_MainWindow(object):
 
     def __init__(self):
         self.app_context = AppContext()
+
+
+    def ui_set_hash_result(self, hash_result):
+        self.hash_result_label.setText(format_hash_result(hash_result))
 
     def ui_set_success_compare(self):
         _translate = QtCore.QCoreApplication.translate
@@ -160,7 +172,9 @@ class Ui_MainWindow(object):
         current_hash_type_index = (current_hash_type_index + 1) % len(hash_type_all)
         global selected_file_path
         if selected_file_path:
-            self.hash_result_label.setText(calculate_file_checksum(selected_file_path))
+            self.hash_thread = GetFileHashThread(selected_file_path)
+            self.hash_thread.start()
+            self.hash_thread.finished.connect(self.ui_set_hash_result)
         self.next_hash_button.setText(hash_type_all[current_hash_type_index])
 
     def on_push_import_button(self):
@@ -174,11 +188,14 @@ class Ui_MainWindow(object):
         last_open_directory = fp
 
         if fp:
-            self.on_push_reset_button()
             selected_file_path = fp
+            self.hash_thread = GetFileHashThread(fp)
+            self.hash_thread.start()
+            self.hash_thread.finished.connect(self.ui_set_hash_result)
+            self.on_push_reset_button()
+
             self.filename_label.setText(fp)
             self.file_extension_label.setText(fp.split('.')[-1])
-            self.hash_result_label.setText(format_hash_result(calculate_file_checksum(fp)))
             self.ui_set_compare_tip_visibility(True)
 
     def on_push_next_hash_button(self):
@@ -187,8 +204,9 @@ class Ui_MainWindow(object):
         next_hash_type_index = (current_hash_type_index + 1) % len(hash_type_all)
 
         if selected_file_path:
-            self.hash_result_label.setText(
-                format_hash_result(calculate_file_checksum(selected_file_path)))
+            self.hash_thread = GetFileHashThread(selected_file_path)
+            self.hash_thread.start()
+            self.hash_thread.finished.connect(self.ui_set_hash_result)
         self.current_hash_label.setText(hash_type_all[current_hash_type_index])
         self.next_hash_label.setText(hash_type_all[next_hash_type_index])
 
@@ -232,7 +250,6 @@ class Ui_MainWindow(object):
             QtWidgets.QApplication.clipboard().setText(hash_result_val)
             self.ui_hide_compare_result()
             self.ui_set_hash_copy_info_visibility(True)
-
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
