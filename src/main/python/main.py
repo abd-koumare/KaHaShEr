@@ -25,8 +25,7 @@ class GetFileHashThread(QtCore.QThread):
         with open(file=self.file_path, mode='rb') as file:
             file_size = os.path.getsize(self.file_path)
             chunk_size = 1024 if file_size * (1024 * 1024) > 100 else 4096
-            already_hash, total_chunk = 0, file_size // chunk_size
-
+            already_hash, total_chunk = 0, file_size // chunk_size or 1
             for chunk in iter(lambda: file.read(chunk_size), b''):
                 self.hash_func.update(chunk)
                 already_hash += 1
