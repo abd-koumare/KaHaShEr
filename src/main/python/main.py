@@ -24,9 +24,9 @@ class GetFileHashThread(QtCore.QThread):
 
         with open(file=self.file_path, mode='rb') as file:
             file_size = os.path.getsize(self.file_path)
-            chunk_size = 1024 if file_size * (1024 * 1024) > 100 else 4096
-            already_hash, total_chunk = 0, file_size // chunk_size or 1
-            for chunk in iter(lambda: file.read(chunk_size), b''):
+
+            already_hash, total_chunk = 0, file_size // 4096 or 1
+            for chunk in iter(lambda: file.read(4096), b''):
                 self.hash_func.update(chunk)
                 already_hash += 1
                 self.loading.emit((already_hash * 100) // total_chunk)
@@ -269,9 +269,12 @@ class Ui_MainWindow(object):
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
+        app_width, app_height = 801, 600
+
+        MainWindow.setFixedSize(app_width, app_height)
 
         ''' Center app on screen fuck the traditional technics '''
-        app_width, app_height = 801, 600
+
         qr = QtWidgets.QDesktopWidget().screenGeometry()
         left = (qr.width() // 2) - (app_width // 2)
         top = (qr.height() // 2) - (app_height // 2)
