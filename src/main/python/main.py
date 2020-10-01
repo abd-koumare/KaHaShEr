@@ -161,6 +161,7 @@ class Ui_MainWindow(object):
         self.hash_result_label.setText(format_hash_result(hash_result))
         global selected_file_path
         self.ui_set_filename(selected_file_path)
+        self.ui_show_hash_process_button()
 
     def ui_set_filename(self, status):
         self.filename_label.setText(status)
@@ -172,13 +173,29 @@ class Ui_MainWindow(object):
         self.filename_label.setStyleSheet("font-weight: bold;\n"
                                           "color: rgb(138, 146, 167);")
 
+    def ui_show_hash_process_button(self):
+        self.import_button.setVisible(True)
+        self.next_hash_button.setVisible(True)
+        self.reset_button.setVisible(True)
+
+    def ui_hide_hash_process_button(self):
+        self.import_button.setVisible(False)
+        self.next_hash_button.setVisible(False)
+        self.reset_button.setVisible(False)
+
     def run_file_hash_thread(self, fp, hash_func):
-        if self.thread and self.thread.isRunning():
-            self.thread.stop()
+        # hide button which will impact hashing process
+        self.ui_hide_hash_process_button()
+
+        self.stop_file_hash_thread()
         self.thread = GetFileHashThread(fp, hash_func)
         self.thread.start()
         self.thread.loading.connect(self.ui_set_progression)
         self.thread.finished.connect(self.ui_set_hash_result)
+
+    def stop_file_hash_thread(self):
+        if self.thread and self.thread.isRunning():
+            self.thread.exit()
 
     def on_push_import_button(self):
         global selected_file_path, last_open_directory, current_clipboard_txt_val
