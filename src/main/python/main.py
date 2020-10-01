@@ -160,9 +160,9 @@ class Ui_MainWindow(object):
     def ui_set_hash_result(self, hash_result):
         self.hash_result_label.setText(format_hash_result(hash_result))
         global selected_file_path
-        self.ui_set_filename_status(selected_file_path)
+        self.ui_set_filename(selected_file_path)
 
-    def ui_set_filename_status(self, status):
+    def ui_set_filename(self, status):
         self.filename_label.setText(status)
         self.filename_label.setStyleSheet("font-weight: bold;\n"
                                           "color: rgb(138, 146, 167);")
